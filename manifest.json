@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "SBIS Service status",
+  "description": "SBIS Service status",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icons/alive.png",
+    "default_popup": "src/popup.html"
+  },
+  "permissions": [
+    "https://test-online.sbis.ru/",
+    "https://test-inside.tensor.ru/",
+    "https://code.jquery.com/"
+  ],
+  "background": {
+    "scripts": ["lib/jquery-2.1.4.min.js", "src/background.js"]
+  }
+}
