@@ -63,7 +63,7 @@ var getTimeDeltaString = function(time1, time2) {
    } else if (deltaS < 60*60) {
       return Math.floor(deltaS / 60) + 'm';
    } else {
-      return Math.floor(deltaS / 60 * 60) + 'h';
+      return Math.floor(deltaS / (60 * 60)) + 'h';
    }
 };
 
