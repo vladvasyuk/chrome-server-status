@@ -1,4 +1,21 @@
 body {
-   width: 250px;
-   height: 80px;
+   width: 500px;
+}
+
+#serviceUrl {
+    width: 350px;
+}
+
+#timeOut {
+    width: 60px;
+}
+
+#interval {
+    width: 60px;
+}
+
+#saveChanges {
+    width: 200px;
+    margin: 10px auto;
+    display: block;
 }

@@ -1,60 +1,64 @@
-var services = {
-   'test-online.sbis.ru': {
-      'url': 'https://test-online.sbis.ru/service/sbis-rpc-service300.dll',
-      'status': false,
-      'main': true,
-      'last_status_time': new Date()
-   },
-   'test-inside.tensor.ru': {
-      'url': 'https://test-inside.tensor.ru/service/sbis-rpc-service300.dll',
-      'status': false,
-      'main': false,
-      'last_status_time': new Date()
-   }
+/**
+ * Информация о статусе сервера
+ */
+var service = {
+   'status': false,
+   'last_status_time': new Date()
 };
 
-var makeRequest = function(service) {
-   $.ajax({
-      url: service.url, 
-      type: 'get',
-      timeout: 3000,
-      xhrFields: {
-         withCredentials: true
-      },
-      error: function(XMLHttpRequest, textStatus, errorThrown){
-         if (service.main) {
+/**
+ * Значения по-умолчанию
+ */
+var defaults = {
+   'serviceUrl': 'http://test-online.sbis.ru/service/sbis-rpc-service300.dll',
+   'timeOut': 3000,
+   'interval': 5000
+};
+
+/**
+ * Функция выполняющая запрос к сервису и обновляющая иконку расширения
+ */
+var makeRequest = function() {
+   chrome.storage.sync.get(['serviceUrl', 'timeOut', 'interval'], function(data) {
+      $.ajax({
+         url: data['serviceUrl'], 
+         type: 'get',
+         timeout: data['timeOut'],
+         xhrFields: {
+            withCredentials: true
+         },
+         error: function(XMLHttpRequest, textStatus, errorThrown){
             chrome.browserAction.setIcon({
                path: 'icons/dead.png'
             });
             if (service.status !== false) {
                service.last_status_time = new Date();
             }
-         }
-         service.status = false;
-      },
-      success: function(data){
-         if (service.main) {
+            service.status = false;
+         },
+         success: function(data){
             chrome.browserAction.setIcon({
                path: 'icons/alive.png'
             });
-         }
-         if (service.status !== true) {
-            service.last_status_time = new Date();
-         }
-         service.status = true;
-      },
-      complete: function() {
-         if (service.main) {
+            if (service.status !== true) {
+               service.last_status_time = new Date();
+            }
+            service.status = true;
+         },
+         complete: function() {
             chrome.browserAction.setBadgeText({
                text: getTimeDeltaString(new Date(), service['last_status_time'])});
+            setTimeout(function() {
+               makeRequest();
+            }, data['interval']);
          }
-         setTimeout(function() {
-            makeRequest(service);
-         }, 5000);
-      }
+      });
    });
 };
 
+/**
+ * Функция-хелпер. Переводит временной промежуток в удобочитаему строку
+ */
 var getTimeDeltaString = function(time1, time2) {
    var deltaMs = time1 - time2;
    var deltaS = Math.floor(deltaMs / 1000);
@@ -67,12 +71,19 @@ var getTimeDeltaString = function(time1, time2) {
    }
 };
 
-
+/**
+ * При загрузке расширения запускаем первый запрос, который будет вызывать себя
+ * рекурсивно
+ */
 window.onload = function() {
-   chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 255, 255]});
-   for (service in services) {
-      if (services.hasOwnProperty(service)) {
-         makeRequest(services[service]);
-      }
-   }
+   chrome.storage.sync.get(['serviceUrl', 'timeOut', 'interval'], function(data) {
+      // Если значения не заданы пользователем, ставим значения по-умолчанию
+      chrome.storage.sync.set({
+         'serviceUrl': data['serviceUrl'] || defaults['serviceUrl'],
+         'timeOut': data['timeOut'] || defaults['timeOut'],
+         'interval': data['interval'] || defaults['interval']
+      });
+      chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 255, 255]});
+      makeRequest();
+   });
 };

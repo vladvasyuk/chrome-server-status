@@ -7,10 +7,20 @@
    <script src="popup.js"></script>
 </head>
 <body>
-   <h3>Состояние сервисов</h3>
-   <ul>
-      <li data-url="test-online.sbis.ru"><b>test-online.sbis.ru</b> - <span>загрузка...</span></li>
-      <li data-url="test-inside.tensor.ru"><b>test-inside.tensor.ru</b> - <span>загрузка...</span></li>
-   </ul>
+   <table>
+      <thead>
+         <th>Адрес сервиса</th>
+         <th>Интервал</th>
+         <th>Таймаут</th>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="text" id="serviceUrl" /></td>
+            <td><input type="text" id="interval" /></td>
+            <td><input type="text" id="timeOut" /></td>
+         </tr>
+      </tbody>
+   </table>
+   <input type="button" id="saveChanges" value="Сохранить изменения" />
 </body>
 </html>

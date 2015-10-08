@@ -10,9 +10,9 @@
     "default_popup": "src/popup.html"
   },
   "permissions": [
-    "https://test-online.sbis.ru/",
-    "https://test-inside.tensor.ru/",
-    "https://code.jquery.com/"
+    "https://*/",
+    "http://*/",
+    "storage"
   ],
   "background": {
     "scripts": ["lib/jquery-2.1.4.min.js", "src/background.js"]
