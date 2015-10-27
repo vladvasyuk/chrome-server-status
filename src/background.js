@@ -1,7 +1,11 @@
 /**
  * Информация о статусе сервера
  */
-var service = {
+
+// Флаг, показывающий запущен ли опрос сервиса
+var RUNNING = false;
+
+var server = {
    'status': false,
    'last_status_time': new Date()
 };
@@ -10,7 +14,6 @@ var service = {
  * Значения по-умолчанию
  */
 var defaults = {
-   'serviceUrl': 'http://test-online.sbis.ru/service/sbis-rpc-service300.dll',
    'timeOut': 3000,
    'interval': 5000
 };
@@ -19,9 +22,19 @@ var defaults = {
  * Функция выполняющая запрос к сервису и обновляющая иконку расширения
  */
 var makeRequest = function() {
-   chrome.storage.sync.get(['serviceUrl', 'timeOut', 'interval'], function(data) {
+   chrome.storage.sync.get(['serverUrl', 'timeOut', 'interval'], function(data) {
+      // Если не указан адрес сервиса, опрос не запускаем
+      if(!data['serverUrl']) {
+         server.status = null;
+         chrome.browserAction.setIcon({
+            path: 'icons/dead.png'
+         });
+         chrome.browserAction.setBadgeText({text: ''});
+         RUNNING = false;
+         return;
+      }
       $.ajax({
-         url: data['serviceUrl'], 
+         url: data['serverUrl'], 
          type: 'get',
          timeout: data['timeOut'],
          xhrFields: {
@@ -31,23 +44,23 @@ var makeRequest = function() {
             chrome.browserAction.setIcon({
                path: 'icons/dead.png'
             });
-            if (service.status !== false) {
-               service.last_status_time = new Date();
+            if (server.status !== false) {
+               server.last_status_time = new Date();
             }
-            service.status = false;
+            server.status = false;
          },
          success: function(data){
             chrome.browserAction.setIcon({
                path: 'icons/alive.png'
             });
-            if (service.status !== true) {
-               service.last_status_time = new Date();
+            if (server.status !== true) {
+               server.last_status_time = new Date();
             }
-            service.status = true;
+            server.status = true;
          },
          complete: function() {
             chrome.browserAction.setBadgeText({
-               text: getTimeDeltaString(new Date(), service['last_status_time'])});
+               text: getTimeDeltaString(new Date(), server['last_status_time'])});
             setTimeout(function() {
                makeRequest();
             }, data['interval']);
@@ -72,18 +85,47 @@ var getTimeDeltaString = function(time1, time2) {
 };
 
 /**
- * При загрузке расширения запускаем первый запрос, который будет вызывать себя
- * рекурсивно
+ * Запускает опрос сервиса при наличии необходимых данных
  */
-window.onload = function() {
-   chrome.storage.sync.get(['serviceUrl', 'timeOut', 'interval'], function(data) {
-      // Если значения не заданы пользователем, ставим значения по-умолчанию
+var run = function() {
+   chrome.storage.sync.get(['serverUrl', 'timeOut', 'interval'], function(data) {
+      // Если значения интервала и тайм-аута не заданы пользователем,
+      // ставим значения по-умолчанию
       chrome.storage.sync.set({
-         'serviceUrl': data['serviceUrl'] || defaults['serviceUrl'],
          'timeOut': data['timeOut'] || defaults['timeOut'],
          'interval': data['interval'] || defaults['interval']
       });
-      chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 255, 255]});
+      // Если не указан адрес сервиса, опрос не запускаем
+      if(!data['serverUrl']) {
+         return;
+      }
+      RUNNING = true;
       makeRequest();
    });
+};
+
+/**
+ * Подписываемся на изменения информации в хранилище, чтобы запустить опрос,
+ * если он ещё не был запущен (URL не указан)
+ */
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+   // Если поменялся адрес сервиса, сбрасываем информацию о статусе
+   if ('serverUrl' in changes) {
+      server.status = null;
+      chrome.browserAction.setIcon({
+         path: 'icons/dead.png'
+      });
+      chrome.browserAction.setBadgeText({text: ''});
+   }
+   if (!RUNNING) {
+      run();
+   }
+});
+
+/**
+ * Инициализируем расширение и запускаем опрос сервиса
+ */
+window.onload = function() {
+   chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 255, 255]});
+   run();
 };

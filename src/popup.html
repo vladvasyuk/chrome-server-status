@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-   <title>SBIS Service status</title>
+   <title>server status</title>
    <link href="style.css" rel="stylesheet" type="text/css">
    <script src="../lib/jquery-2.1.4.min.js"></script>
    <script src="popup.js"></script>
@@ -10,18 +10,18 @@
 <body>
    <table>
       <thead>
-         <th>Адрес сервиса</th>
-         <th>Интервал</th>
-         <th>Таймаут</th>
+         <th>Server address</th>
+         <th>Poll interval, ms</th>
+         <th>Timeout, ms</th>
       </thead>
       <tbody>
          <tr>
-            <td><input type="text" id="serviceUrl" /></td>
+            <td><input type="text" id="serverUrl" placeholder="http://example.com" /></td>
             <td><input type="text" id="interval" /></td>
             <td><input type="text" id="timeOut" /></td>
          </tr>
       </tbody>
    </table>
-   <input type="button" id="saveChanges" value="Сохранить изменения" />
+   <input type="button" id="saveChanges" value="Save changes" />
 </body>
 </html>

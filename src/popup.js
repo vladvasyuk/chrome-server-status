@@ -5,7 +5,7 @@ var bg = chrome.extension.getBackgroundPage();
  */
 var saveChanges = function() {
    chrome.storage.sync.set({
-      'serviceUrl': $('#serviceUrl').val(),
+      'serverUrl': $('#serverUrl').val(),
       'timeOut': $('#timeOut').val(),
       'interval': $('#interval').val()
    }, function() {
@@ -15,8 +15,8 @@ var saveChanges = function() {
 
 $(document).ready(function() {
    // При открытии ставим в поля значения из хранилища
-   chrome.storage.sync.get(['serviceUrl', 'timeOut', 'interval'], function(data) {
-      $('#serviceUrl').val(data['serviceUrl']);
+   chrome.storage.sync.get(['serverUrl', 'timeOut', 'interval'], function(data) {
+      $('#serverUrl').val(data['serverUrl']);
       $('#timeOut').val(data['timeOut']);
       $('#interval').val(data['interval']);
    });

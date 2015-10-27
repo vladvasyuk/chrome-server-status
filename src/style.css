@@ -1,17 +1,17 @@
 body {
-   width: 500px;
+   width: 580px;
 }
 
-#serviceUrl {
+#serverUrl {
     width: 350px;
 }
 
 #timeOut {
-    width: 60px;
+    width: 100px;
 }
 
 #interval {
-    width: 60px;
+    width: 100px;
 }
 
 #saveChanges {
