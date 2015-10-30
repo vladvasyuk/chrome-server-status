@@ -7,14 +7,15 @@
 
   "browser_action": {
     "default_icon": "icons/dead.png",
-    "default_popup": "src/popup.html"
+    "default_popup": "static/popup.html"
   },
   "permissions": [
     "https://*/",
     "http://*/",
     "storage"
   ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "background": {
-    "scripts": ["lib/jquery-2.1.4.min.js", "src/background.js"]
+    "scripts": ["js/lib/jquery-2.1.4.min.js", "js/src/background.js"]
   }
 }

@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+   <title>server status</title>
+   <link href="style.css" rel="stylesheet" type="text/css">
+   <script src="../js/lib/jquery-2.1.4.min.js"></script>
+   <script src="../js/lib/underscore-min.js"></script>
+   <script data-main="../js/src/popup" src="../js/lib/require.js"></script>
+   <meta charset="UTF-8" />
+</head>
+<body>
+   <a href="#" id="addServer">Add server</a>
+   <table data-component="datasheet" class="component" data-name="servers">
+      <tr class="datasheet-row-template">
+         <td data-recordset-field="url">aaaaa</td>
+         <td data-recordset-field="timeout"></td>
+         <td data-recordset-field="interval"></td>
+         <td data-recordset-field="show"></td>
+      </tr>
+   </table>
+
+   <ul data-component="datasheet" class="component" data-name="servers_list">
+      <li class="datasheet-row-template">
+         <ul>
+            <li data-recordset-field="url">aaaaa</li>
+            <li data-recordset-field="timeout"></li>
+            <li data-recordset-field="interval"></li>
+            <li data-recordset-field="show"></li>
+         </ul>
+      </li>
+   </ul>
+
+   <input type="button" id="saveChanges" value="Save changes" />
+</body>
+</html>

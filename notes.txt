@@ -1,0 +1,35 @@
+Задача
+Есть список адресов, состояние которых необходимо проверять
+Список можно менять
+Для каждого адреса можно задавать интервал опроса и таймаут
+
+В панели браузера отображается иконка, которая отображает:
+[ G ] - все сервера работают / состояние выбранных сервисов
+[ R ] - все сервера лежат / состояние выбранных сервисов
+[ Y ] - сервера работают частично / состояние выбранных сервисов
+[ число под иконкой ] - число живых серверов / если выбран один - время последнего статуса
+
+
+
+Набор сервисов
+{
+    url: {last_status_time, timeOut, interval, show},
+    ...
+}
+
+
+1 ----V     | ---V
+2 -------X  | ------X
+3 ---X      | -V
+4 -V        | -V
+5 -V        | -V
+
+
+<table data-component="datasheet" data-recordset="servers" class="component">
+   <tr class="datasheet-row-template">
+      <td data-recordset-field="url"></td>
+      <td data-recordset-field="timeout"></td>
+      <td data-recordset-field="interval"></td>
+      <td data-recordset-field="show"></td>
+   </tr>
+</table>

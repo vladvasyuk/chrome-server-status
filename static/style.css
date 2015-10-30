@@ -1,0 +1,36 @@
+body {
+   width: 580px;
+}
+
+.serverUrl {
+    width: 350px;
+}
+
+.timeOut {
+    width: 100px;
+}
+
+.interval {
+    width: 100px;
+}
+
+#saveChanges {
+    width: 200px;
+    margin: 10px auto;
+    display: block;
+}
+
+a {
+    font-size: 14px;
+    color: #336699;
+    text-decoration: none;
+    border-bottom: 1px dashed #336699;
+}
+
+a:visited {
+    color: #336699;
+}
+
+.component {
+    display: none;
+}
