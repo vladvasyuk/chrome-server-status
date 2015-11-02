@@ -5,31 +5,78 @@
    <link href="style.css" rel="stylesheet" type="text/css">
    <script src="../js/lib/jquery-2.1.4.min.js"></script>
    <script src="../js/lib/underscore-min.js"></script>
+   <link rel="stylesheet" href="../js/lib/mdl/material.min.css">
+   <script src="../js/lib/mdl/material.min.js"></script>
    <script data-main="../js/src/popup" src="../js/lib/require.js"></script>
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
    <meta charset="UTF-8" />
 </head>
 <body>
-   <a href="#" id="addServer">Add server</a>
-   <table data-component="datasheet" class="component" data-name="servers">
-      <tr class="datasheet-row-template">
-         <td data-recordset-field="url">aaaaa</td>
-         <td data-recordset-field="timeout"></td>
-         <td data-recordset-field="interval"></td>
-         <td data-recordset-field="show"></td>
-      </tr>
-   </table>
-
-   <ul data-component="datasheet" class="component" data-name="servers_list">
-      <li class="datasheet-row-template">
-         <ul>
-            <li data-recordset-field="url">aaaaa</li>
-            <li data-recordset-field="timeout"></li>
-            <li data-recordset-field="interval"></li>
-            <li data-recordset-field="show"></li>
-         </ul>
-      </li>
-   </ul>
-
-   <input type="button" id="saveChanges" value="Save changes" />
+   <div>
+      <div class="table-responsive-vertical shadow-z-1">
+         <form action="#">
+         <table data-component="datasheet" class="component servers mdl-data-table" data-name="servers">
+            <thead>
+               <tr>
+                  <th class="servers-status "></th>
+                  <th class="servers-url mdl-data-table__cell--non-numeric">URL</th>
+                  <th class="servers-timeout">Timeout</th>
+                  <th class="servers-interval">Interval</th>
+                  <th class="servers-show mdl-data-table__cell--non-numeric">Watch</th>
+                  <th class="servers-action mdl-data-table__cell--non-numeric"></th>
+               </tr>
+            </thead>
+            <tbody class="datasheet-body">
+               <tr class="datasheet-row-template">
+                  <td class="servers-status mdl-data-table__cell--non-numeric"><i class="material-icons md-18" data-field="status"></i></td>
+                  <td class="servers-url mdl-data-table__cell--non-numeric"><strong data-field="url"></strong></td>
+                  <td class="servers-timeout"><span data-field="timeout"></span> ms</td>
+                  <td class="servers-interval"><span data-field="interval"></span> ms</td>
+                  <td class="servers-show mdl-data-table__cell--non-numeric"><input type="checkbox" data-field="show" class="datasheet-instantEdit" /></td>
+                  <td class="servers-action mdl-data-table__cell--non-numeric">
+                     <i class="datasheet-action datasheet-discardRow material-icons md-18">delete</i>
+                  </td>
+               </tr>
+               <tr class="datasheet-edit-template">
+                  <td class="servers-status"></td>
+                  <td class="servers-url mdl-data-table__cell--non-numeric">
+                     <div class="mdl-textfield mdl-js-textfield ">
+                      <input class="mdl-textfield__input" data-field="url" type="text" id="servers-url" />
+                      <label class="mdl-textfield__label" for="servers-url">Server URL</label>
+                    </div>
+                     <div class="datasheet-validationRes"></div>
+                  </td>
+                  <td class="servers-timeout">
+                     <div class="mdl-textfield mdl-js-textfield ">
+                      <input class="mdl-textfield__input" data-field="timeout" type="text" id="servers-temout" />
+                      <label class="mdl-textfield__label" for="servers-timeout">Answer timeout</label>
+                    </div>
+                     <div class="datasheet-validationRes"></div>
+                  </td>
+                  <td class="servers-interval">
+                     <div class="mdl-textfield mdl-js-textfield ">
+                         <input class="mdl-textfield__input" data-field="interval" type="text" id="servers-interval" data-field="interval" />
+                         <label class="mdl-textfield__label" for="servers-interval">Polling interval</label>
+                       </div>
+                     <div class="datasheet-validationRes"></div>
+                  </td>
+                  <td class="servers-show mdl-data-table__cell--non-numeric">
+                     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="servers-show">
+                        <input type="checkbox" id="servers-show" class="mdl-checkbox__input"  data-field="show" />
+                     </label>
+                  </td>
+                  <td class="servers-action mdl-data-table__cell--non-numeric">
+                     <i class="datasheet-action datasheet-saveRow material-icons md-18">done</i>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+         </form>
+      </div>
+      <div class="text-center">
+         <button class="mdl-button mdl-js-button mdl-button--colored" id="addServer">Add server</button>
+      </div>
+   </div>
 </body>
 </html>

@@ -1,3 +1,11 @@
 .engine-datasheet .datasheet-row-template {
     display: none;
 }
+
+.engine-datasheet .datasheet-edit-template {
+    display: none;
+}
+
+.datasheet-row {
+    cursor: pointer;
+}
