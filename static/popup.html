@@ -11,63 +11,83 @@
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
    <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
    <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
    <div>
       <div class="table-responsive-vertical shadow-z-1">
          <form action="#">
          <table data-component="datasheet" class="component servers mdl-data-table" data-name="servers">
-            <thead>
+            <thead class="datasheet-head">
                <tr>
                   <th class="servers-status "></th>
                   <th class="servers-url mdl-data-table__cell--non-numeric">URL</th>
-                  <th class="servers-timeout">Timeout</th>
-                  <th class="servers-interval">Interval</th>
+                  <th class="servers-url mdl-data-table__cell--non-numeric">Status</th>
+                  <th class="servers-url mdl-data-table__cell--non-numeric">Last change of status</th>
                   <th class="servers-show mdl-data-table__cell--non-numeric">Watch</th>
                   <th class="servers-action mdl-data-table__cell--non-numeric"></th>
                </tr>
             </thead>
             <tbody class="datasheet-body">
                <tr class="datasheet-row-template">
-                  <td class="servers-status mdl-data-table__cell--non-numeric"><i class="material-icons md-18" data-field="status"></i></td>
+                  <td class="servers-status mdl-data-table__cell--non-numeric" data-field="status"></td>
                   <td class="servers-url mdl-data-table__cell--non-numeric"><strong data-field="url"></strong></td>
-                  <td class="servers-timeout"><span data-field="timeout"></span> ms</td>
-                  <td class="servers-interval"><span data-field="interval"></span> ms</td>
-                  <td class="servers-show mdl-data-table__cell--non-numeric"><input type="checkbox" data-field="show" class="datasheet-instantEdit" /></td>
+                  <td class="servers-url mdl-data-table__cell--non-numeric">
+                     <strong data-field="status_code"></strong>
+                  </td>
+                  <td class="servers-url mdl-data-table__cell--non-numeric">
+                     <span data-field="last_status_time"></span>
+                  </td>
+                  <td class="servers-show mdl-data-table__cell--non-numeric">
+                     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect datasheet-instantEdit-container" for="servers-show">
+                        <input type="checkbox" id="servers-show" class="mdl-checkbox__input datasheet-instantEdit"  data-field="show" />
+                     </label>
+                  </td>
                   <td class="servers-action mdl-data-table__cell--non-numeric">
-                     <i class="datasheet-action datasheet-discardRow material-icons md-18">delete</i>
+                     <button class="mdl-button mdl-js-button mdl-button--icon datasheet-action datasheet-discardRow">
+                        <i class="material-icons">delete</i>
+                     </button>
                   </td>
                </tr>
                <tr class="datasheet-edit-template">
                   <td class="servers-status"></td>
-                  <td class="servers-url mdl-data-table__cell--non-numeric">
-                     <div class="mdl-textfield mdl-js-textfield ">
+                  <td class="servers-url mdl-data-table__cell--non-numeric servers-name" colspan="4">
+                     <!-- Name -->
+                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" data-field="name" type="text" id="servers-name" />
+                      <label class="mdl-textfield__label" for="servers-name">Display name</label>
+                     </div>
+                     <div class="datasheet-validationRes" data-validationRes-field="name"></div>
+
+                     <!-- Url -->
+                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                       <input class="mdl-textfield__input" data-field="url" type="text" id="servers-url" />
                       <label class="mdl-textfield__label" for="servers-url">Server URL</label>
-                    </div>
-                     <div class="datasheet-validationRes"></div>
-                  </td>
-                  <td class="servers-timeout">
-                     <div class="mdl-textfield mdl-js-textfield ">
+                     </div>
+                     <div class="datasheet-validationRes" data-validationRes-field="url"></div>
+
+                     <!-- Timeout -->
+                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-timeout">
                       <input class="mdl-textfield__input" data-field="timeout" type="text" id="servers-temout" />
                       <label class="mdl-textfield__label" for="servers-timeout">Answer timeout</label>
-                    </div>
-                     <div class="datasheet-validationRes"></div>
-                  </td>
-                  <td class="servers-interval">
-                     <div class="mdl-textfield mdl-js-textfield ">
-                         <input class="mdl-textfield__input" data-field="interval" type="text" id="servers-interval" data-field="interval" />
-                         <label class="mdl-textfield__label" for="servers-interval">Polling interval</label>
-                       </div>
-                     <div class="datasheet-validationRes"></div>
-                  </td>
-                  <td class="servers-show mdl-data-table__cell--non-numeric">
-                     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="servers-show">
-                        <input type="checkbox" id="servers-show" class="mdl-checkbox__input"  data-field="show" />
-                     </label>
+                     </div>
+                     <div class="datasheet-validationRes" data-validationRes-field="timeout"></div>
+
+                     <!-- Interval -->
+                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-interval">
+                        <input class="mdl-textfield__input" data-field="interval" type="text" id="servers-interval" data-field="interval" />
+                        <label class="mdl-textfield__label" for="servers-interval">Polling interval</label>
+                     </div>
+                     <div class="datasheet-validationRes" data-validationRes-field="interval"></div>
+
                   </td>
                   <td class="servers-action mdl-data-table__cell--non-numeric">
-                     <i class="datasheet-action datasheet-saveRow material-icons md-18">done</i>
+                     <button class="mdl-button mdl-js-button mdl-button--icon datasheet-action datasheet-saveRow">
+                        <i class="material-icons">done</i>
+                     </button> <br /> <br />
+                     <button class="mdl-button mdl-js-button mdl-button--icon datasheet-discardRow datasheet-action">
+                        <i class="material-icons">delete</i>
+                     </button>
                   </td>
                </tr>
             </tbody>

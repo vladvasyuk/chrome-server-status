@@ -1,108 +1,62 @@
-body {
-   width: 700px !important;
-   font-family: 'Roboto','Helvetica','Arial',sans-serif!important;
-   padding: 5px;
-   margin: 0;
-   background: #f5f5f5;
-}
-
 body, html {
-    height: auto;
+   font-family: 'Roboto','Helvetica','Arial',sans-serif!important;
+   background: #f5f5f5;
+   height: inherit !important;
+   overflow: hidden !important;
+   padding: 5px;
 }
 
-#saveChanges {
-    width: 200px;
-    margin: 10px auto;
-    display: block;
-}
 .text-center {
     text-align: center;
 }
 
+#addServer {
+    margin-top: 15px;
+}
+
+.servers {
+    width: 600px;
+}
+
+.servers .servers-interval {
+    width: 210px;
+}
+
+.servers .servers-url {
+    width: 420px;
+}
+
+.servers .servers-timeout {
+    width: 210px;
+}
+
+.servers tr td:nth-child(1) {
+    width: 67px;
+}
+.servers tr td:nth-child(2) {
+    width: 368px;
+}
+.servers tr td:nth-child(3) {
+    width: 70px;
+}
+.servers tr td:nth-child(4) {
+    width: 66px;
+}
 .component {
     display: none;
 }
 
-#addServer {
-    font-size: 14px;
-    margin: 15px;
-}
-
-.servers {
-    border: none;
-}
-
-.servers-url {
-    width: 50%;
-}
-
-.servers-url .mdl-textfield {
-    width: 205px;
-}
-
-.servers-timeout {
-    width: 15%;
-}
-
-
-.servers-timeout .mdl-textfield {
-    width: 100px;
-}
-
-.servers-interval {
-    width: 15%;
-}
-
-.servers-interval .mdl-textfield {
-    width: 100px;
-}
-
-.servers-show {
-    width: 10%;
-}
-
-.servers-action {
-    width: 10%;
-}
-
-.servers {
-    clear: both;
-    margin-bottom: 8px;
-    width: 100%;
-}
-
-.servers tr td {
-    vertical-align: top;
-}
-
-.servers tr {
-    margin: 0;
-    height: 30px;
-    padding: 0;
-}
-
-.servers td {
-    padding: 4px;
-    margin: 0;
-}
-
-.datasheet-action {
-    cursor: pointer;
-}
-
-.servers .datasheet-action {
-    visibility: hidden;
-}
-
-.servers tr:hover .datasheet-action,
-.servers td:hover .datasheet-action {
-    visibility: visible;
-}
-
-.servers .datasheet-validationRes div {
+.datasheet-validationRes {
+    margin-top: -10px;
+    margin-bottom: 10px;
     color: red;
-    margin-bottom: 4px;
 }
-.servers .datasheet-validationRes div:last-child {
-    margin-bottom: none;
+
+.servers tr .datasheet-action {
+    visibility: hidden;
+    margin-top: -4px;
+}
+
+.servers tr:hover   .datasheet-action {
+    visibility: visible;
 }

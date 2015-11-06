@@ -41,7 +41,7 @@ function getTimeDeltaString(time1, time2) {
  * @return {[type]} [description]
  */
 function updateIcon() {
-    chrome.storage.sync.get(['servers'], function(data) {
+    chrome.storage.local.get(['servers'], function(data) {
         /** @type {Number} alive servers count */
         var alive = 0;
 
@@ -49,7 +49,7 @@ function updateIcon() {
         var watchedServers = _.filter(data['servers'], function(e) { return e['show'] });
 
         for (key in watchedServers) {
-            if (watchedServers[key]['status'] == 'done') {
+            if (watchedServers[key]['status'] == 'success') {
                 alive++;
             }
         }
@@ -91,7 +91,7 @@ function updateData() {
 
     chrome.browserAction.setBadgeText({text: ''});
 
-    chrome.storage.sync.get(['servers'], function(data) {
+    chrome.storage.local.get(['servers'], function(data) {
         if (!data['servers']) {
             return;
         }
@@ -116,22 +116,17 @@ function runCheck(key, data, session_id) {
         actualUrl,
         data[key]['timeout']
     ));
-    def.always(function(html, status) {
+    def.always(function(html, status, response) {
         if (session_id != SESSION_ID) {
             return;
         }
-        var oldStatus = data[key]['status'];
-        if (status == 'success') {
-            data[key]['status'] = 'done';
-        } else if (status == 'timeout') {
-            data[key]['status'] = 'schedule';
-        } else {
-            data[key]['status'] = status;
-        }
-        if (data[key]['status'] !== oldStatus) {
+        if (data[key]['status'] !== status) {
             data[key]['last_status_time'] = new Date().toString();
         }
-        chrome.storage.sync.set({
+        data[key]['status'] = status;
+        data[key]['status_code'] = response['status'];
+        data[key]['status_text'] = response['statusText'];
+        chrome.storage.local.set({
             'servers': data
         }, updateIcon);
         setTimeout(function() {

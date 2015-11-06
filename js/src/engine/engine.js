@@ -43,7 +43,7 @@ define(function() {
 
                 // require appropriate component
                 require([TPL_COMPONENT_PATH({'name': $(this).data('component')})], function(component) {
-                    new component().init(self);
+                    new component().init({element: self});
                     def.resolve();
                 });
             });

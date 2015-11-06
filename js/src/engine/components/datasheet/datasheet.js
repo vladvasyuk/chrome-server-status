@@ -6,12 +6,36 @@ define([
          * Init component
          * @param  {object} element
          */
-        this.init = function(element) {
-            this._data = {};
-            this._validators = {};
-            this.$element = $(element);
+        this.init = function(config) {
+            if (!('element' in config)) {
+                console.log('Engine.Datasheet: element is required for init');
+                return;
+            }
+
+            this._data = config['data'] || {};
+            this._validators = config['data'] || {};
+            this._renders = config['renders'] || {};
+            this._defaults = config['defaults'] || {};
+            this.$element = $(config['element']);
             this.$element[0].eControl = this;
             this.$element.addClass('engine-datasheet');
+            this.render();
+        };
+
+        /**
+         * Return data collection rows count
+         * @param  {Boolean} withDrafts incldue drafts to count
+         * @return {Number}            rows count
+         */
+        this.getRowsCount = function(withDrafts) {
+            var count = 0;
+            var keysArr = Object.getOwnPropertyNames(this._data);
+            for (rowkey in keysArr) {
+                if (withDrafts || (!withDrafts && !('_draft' in this._data[keysArr[rowkey]]))) {
+                    count++;
+                }
+            }
+            return count;
         };
 
         /**
@@ -19,8 +43,8 @@ define([
          */
         this.render = function() {
             var self = this;
-            if (!this._data) {
-                console.log('Engine.Datasheet: no data, render stopped');
+            if (!this.getRowsCount(true)) {
+                this.addRow();
                 return;
             }
 
@@ -46,13 +70,40 @@ define([
                     var $row = this._renderRow($row_template, row_key);
                 }
                 $row.attr('data-rowkey', row_key);
+                $row.find('[id]').each(function() {
+                    $(this).attr('id', $(this).attr('id') + row_key);
+                });
+                $row.find('[for]').each(function() {
+                    $(this).attr('for', $(this).attr('for') + row_key);
+                });
                 // append created row to "body" element of datasheet
                 this.$element.find('.datasheet-body').append($row);
             }
 
-            this.$element.show();
+            // bind action buttons
+            $row.find('.datasheet-saveRow').click(function() {
+                self.saveRow(row_key);
+            });
+            $row.find('.datasheet-discardRow').click(function() {
+                self.discardRow(row_key);
+            });
 
             componentHandler.upgradeDom();
+
+            if (!this.getRowsCount()) {
+                // hide header if there is no data
+                this.$element.find('.datasheet-head').hide();
+            } else {
+                this.$element.find('.datasheet-head').show();
+            }
+            if (!this.getRowsCount(true)) {
+                // hide component if there is no data
+                this.$element.hide();
+                this.$element.addClass('.datasheet-hidden');
+            } else {
+                this.$element.show();
+                this.$element.removeClass('.datasheet-hidden');
+            }
 
             // if there is draft, focus on it's children, for working 'onfocusout-save' functionality
             var invalidFields = this.$element.find('.datasheet-edit .datasheet-invalidField');
@@ -97,10 +148,9 @@ define([
             if (this._data[row_key]['_validationRes']) {
                 /** @type {jQuery} container for validation messages */
                 for (var field in this._data[row_key]['_validationRes']) {
-                    var $dataElement = $row.find('[data-field=' + field + ']');
-                    var validationContainer = $dataElement.siblings('.datasheet-validationRes');
+                    var validationContainer = $row.find('[data-validationRes-field=' + field + ']');
                     validationContainer.empty();
-                    $dataElement.addClass('datasheet-invalidField')
+                    $row.find('[data-field=' + field + ']').addClass('datasheet-invalidField');
                     for (var ind in this._data[row_key]['_validationRes'][field]) {
                         validationContainer.append(
                             $('<div>',
@@ -116,22 +166,10 @@ define([
             // remove previous validation messages
             delete this._data[row_key]['_validationRes'];
 
-            // save row on action-icon click
-            $row.find('.datasheet-saveRow').click(function() {
-                self.saveRow(row_key);
-            });
             // save row on enter key pressed
             $row.keyup(function(e) {
                 // 13 - ENTER
                 if (e.which == 13) {
-                    self.saveRow(row_key);
-                }
-            });
-            // also save row on focusout from component
-            $row.focusout(function(e) {
-                return;
-                // relatedTarget - target where focus comes in
-                if (!$row.has(e.relatedTarget).length) {
                     self.saveRow(row_key);
                 }
             });
@@ -153,6 +191,10 @@ define([
             // go over keys in row and fill td's
             for (key in this._data[row_key]) {
                 var el = $row.find('[data-field=' + key + ']');
+                if (key in this._renders) {
+                    el.html(this._renders[key](this._data[row_key]));
+                    continue;
+                }
                 if (el.is('input[type=checkbox]')) {
                     if (this._data[row_key][key]) {
                         el.attr('checked', 'checked');
@@ -163,12 +205,12 @@ define([
                     el.html(this._data[row_key][key]);
                 }
             }
-            $row.find('.datasheet-discardRow').click(function() {
-                self.discardRow(row_key);
-            });
-            $row.find('.datasheet-instantEdit').click(function(e) {
-                e.stopPropagation();
-            });
+
+            $row.find('.datasheet-instantEdit, .datasheet-instantEdit-container').click(
+                function(e) {
+                    e.stopPropagation();
+                }
+            );
             $row.find('.datasheet-instantEdit').change(function(e) {
                 var saveResult = self.saveField(
                     $(this).attr('data-field'),
@@ -230,8 +272,20 @@ define([
                 console.log('Engine.Datasheet: cant add new row, drafts exists in dataset');
                 return;
             }
-            this._data[_.uniqueId()] = {'_draft': true};
+            this._data[_.uniqueId()] = jQuery.extend(
+                true,
+                {'_draft': true},
+                this._defaults
+            );
             this.render();
+        };
+
+        /**
+         * [setDefaultValues description]
+         * @param {[type]} defaults [description]
+         */
+        this.setDefaultValues = function(defaults) {
+            this._defaults = defaults;
         };
 
         /**
@@ -371,5 +425,13 @@ define([
             }
             return false;
         };
+
+        /**
+         * [setRenders description]
+         * @param {[type]} renders [description]
+         */
+        this.setRenders = function(renders) {
+            this._renders = renders;
+        }
     }
 });

@@ -9,3 +9,8 @@
 .datasheet-row {
     cursor: pointer;
 }
+
+.datasheet-hidden {
+    background: none;
+    border: none;
+}
