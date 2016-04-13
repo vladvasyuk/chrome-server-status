@@ -129,7 +129,26 @@ function runCheck(key, data, session_id) {
         }
         if (data[key]['status'] !== status) {
             data[key]['last_status_time'] = new Date().toString();
+
+            // Build notification based on server status
+            if (status == 'success') {
+                var icon = 'icons/alive_128.png';
+                var message = 'Server is UP';
+            } else {
+                var icon = 'icons/dead_128.png';
+                var message = 'Server is DOWN';
+            }
+
+            chrome.notifications.create('reminder', {
+                type: 'basic',
+                iconUrl: icon,
+                title: data[key]['name'] || data[key]['url'],
+                message: message
+            }, function(notificationId) {
+
+            });
         }
+
         data[key]['time_delta'] = getTimeDeltaString(new Date(), new Date(data[key]['last_status_time']));
         data[key]['status'] = status;
         data[key]['status_code'] = response['status'] || null;
