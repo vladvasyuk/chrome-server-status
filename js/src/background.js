@@ -96,13 +96,20 @@ function updateData() {
             return;
         }
         for (key in data['servers']) {
-            if (data['servers'][key]['show']) {
+            if (data['servers'][key]['show'] && !('_editing' in data['servers'][key] || '_draft' in data['servers'][key])) {
                 runCheck(key, data['servers'], SESSION_ID);
             }
         }
     });
 };
 
+/**
+ * [runCheck description]
+ * @param  {[type]} key        [description]
+ * @param  {[type]} data       [description]
+ * @param  {[type]} session_id [description]
+ * @return {[type]}            [description]
+ */
 function runCheck(key, data, session_id) {
     if (session_id != SESSION_ID) {
         return;
@@ -123,12 +130,14 @@ function runCheck(key, data, session_id) {
         if (data[key]['status'] !== status) {
             data[key]['last_status_time'] = new Date().toString();
         }
+        data[key]['time_delta'] = getTimeDeltaString(new Date(), new Date(data[key]['last_status_time']));
         data[key]['status'] = status;
-        data[key]['status_code'] = response['status'];
-        data[key]['status_text'] = response['statusText'];
+        data[key]['status_code'] = response['status'] || null;
+        data[key]['status_text'] = response['statusText'] || null;
         chrome.storage.local.set({
             'servers': data
         }, updateIcon);
+        chrome.extension.sendMessage({'type': 'dataChanged'});
         setTimeout(function() {
             runCheck(key, data, session_id)
         }, parseInt(data[key]['interval']));

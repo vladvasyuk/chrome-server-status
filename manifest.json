@@ -3,7 +3,7 @@
 
   "name": "Server Status",
   "description": "Server Status",
-  "version": "1.1",
+  "version": "1.5",
 
   "browser_action": {
     "default_icon": "icons/dead.png",
