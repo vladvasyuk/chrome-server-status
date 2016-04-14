@@ -19,6 +19,16 @@ function makeRequest(url, timeout) {
 };
 
 /**
+ * [toLocation description]
+ * @return {[type]} [description]
+ */
+String.prototype.toLocation = function() {
+    var a = document.createElement('a');
+    a.href = this;
+    return a;
+};
+
+/**
  * [getTimeDeltaString description]
  * @param  {[type]} time1 [description]
  * @param  {[type]} time2 [description]
@@ -139,7 +149,7 @@ function runCheck(key, data, session_id) {
                 var message = 'Server is DOWN';
             }
 
-            chrome.notifications.create('reminder', {
+            chrome.notifications.create(data[key]['url'].toLocation().origin + '__' + key, {
                 type: 'basic',
                 iconUrl: icon,
                 title: data[key]['name'] || data[key]['url'],
@@ -165,5 +175,8 @@ function runCheck(key, data, session_id) {
 
 window.onload = function() {
    chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 255, 255]});
+   chrome.notifications.onClicked.addListener(function(id) {
+       chrome.tabs.create({url: id.split('__')[0]});
+   });
    updateData();
 };

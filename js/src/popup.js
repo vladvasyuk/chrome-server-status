@@ -9,14 +9,34 @@ require.config({
 });
 
 /**
+ * [padZero description]
+ * @param  {[type]} len [description]
+ * @return {[type]}     [description]
+ */
+Number.prototype.padZero = function(len) {
+    var s = String(this), c= '0';
+    len = len || 2;
+    while(s.length < len) s= c + s;
+    return s;
+};
+
+/**
  * [updateView description]
  * @return {[type]} [description]
  */
 function updateView() {
     chrome.storage.local.get(['servers'], function(data) {
-        if (data['servers'].length) {
-            eng.findComponent('servers').setData(data['servers']);
+        var serversTable = eng.findComponent('servers');
+        data['servers'] = data['servers'] || {};
+        serversTable.setData(data['servers'], true);
+        if (!serversTable.isThereDrafts() && !serversTable.isThereEditing()) {
+            // add empty row if there's no data
+            if (!serversTable.getRowsCount(true)) {
+                serversTable.addRow(true);
+            }
         }
+        serversTable.render();
+
     });
 }
 
@@ -55,14 +75,13 @@ require([
                     Validators.minValue(5000, 'Minimum value for interval is 5000ms')
                 ],
                 'timeout': [
-                    Validators.required('Timeout is required'),
-                    Validators.minValue(5000, 'Minimum value for timeout is 5000ms')
+                    Validators.required('Timeout is required')
                 ]
             });
 
             serversTable.setDefaultValues({
                 'interval': 5000,
-                'timeout': 5000,
+                'timeout': 3000,
                 'show': true
             });
 
@@ -85,7 +104,6 @@ require([
                 },
                 status_code: function(row) {
                     if (row['status_code']) { 
-                        console.log(row['status_code']);
                         return row['status_code'] + ' ' + row['status_text']; 
                     } else if (row['status'] == 'timeout') {
                         return 'timeout';
@@ -97,24 +115,27 @@ require([
                     var date = new Date(row['last_status_time']);
                     var formatDict = {
                         'hours': date.getHours(),
-                        'minutes': date.getMinutes(),
-                        'day': date.getDate(),
+                        'minutes': date.getMinutes().padZero(),
+                        'day': date.getDate().padZero(),
                         'month': date.getMonth() + 1,
                         'year': date.getFullYear(),
-                        'delta': bg.getTimeDeltaString(new Date(), date)
+                        'delta': row['time_delta']
                     };
                     var template = _.template('<%=hours%>:<%=minutes%> <%=day%>.<%=month%>.<%=year%> (<strong><%=delta%></strong>)');
                     return template(formatDict);
                 }
             });
 
-            // on collection data changed - reload table
-            chrome.storage.onChanged.addListener(function(changes, namespace) {
-                if (!serversTable.isThereDrafts()) {
-                    updateView();
-                }
-            });
             updateView();
+
+            // on collection data changed - reload table
+            chrome.runtime.onMessage.addListener(
+                function(request, sender, sendResponse) {
+                    if (request['type'] == 'dataChanged') {
+                        updateView();   
+                    }
+                }
+            );
         });
 
         eng.go();

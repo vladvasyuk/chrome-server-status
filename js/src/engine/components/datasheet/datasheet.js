@@ -1,6 +1,7 @@
 define([
    'css!src/engine/components/datasheet/datasheet'
 ], function () {
+
     return function() {
         /**
          * Init component
@@ -12,6 +13,7 @@ define([
                 return;
             }
 
+            this._previous_data = {};
             this._data = config['data'] || {};
             this._validators = config['data'] || {};
             this._renders = config['renders'] || {};
@@ -19,7 +21,6 @@ define([
             this.$element = $(config['element']);
             this.$element[0].eControl = this;
             this.$element.addClass('engine-datasheet');
-            this.render();
         };
 
         /**
@@ -30,7 +31,7 @@ define([
         this.getRowsCount = function(withDrafts) {
             var count = 0;
             var keysArr = Object.getOwnPropertyNames(this._data);
-            for (rowkey in keysArr) {
+            for (var rowkey in keysArr) {
                 if (withDrafts || (!withDrafts && !('_draft' in this._data[keysArr[rowkey]]))) {
                     count++;
                 }
@@ -43,10 +44,6 @@ define([
          */
         this.render = function() {
             var self = this;
-            if (!this.getRowsCount(true)) {
-                this.addRow();
-                return;
-            }
 
             // find template rows
 
@@ -55,40 +52,78 @@ define([
             
             /** @type {jQuery} template for editing row */
             var $edit_template = this.$element.find('.datasheet-edit-template');
-
-            // remove all data and edit rows
-            this.$element.find('.datasheet-row').remove();
-            this.$element.find('.datasheet-edit').remove();
+            
+            // remove all rows with keys not present in new data
+            var new_data_keys = Object.keys(this._data);
+            var old_data_keys = Object.keys(this._previous_data);
+            this.$element.find('.datasheet-row, .datasheet-edit').each(function() {
+                if (new_data_keys.indexOf($(this).attr('data-rowkey')) == -1) {
+                    $(this).remove();
+                }
+            });
 
             // go over rows in data and render table rows
             for (var row_key in this._data) {
-                if (this._data[row_key]['_draft']) {
-                    // drafts render with edit template
-                    var $row = this._renderEditRow($edit_template, row_key);
-                } else {
-                    // common rows with row template
-                    var $row = this._renderRow($row_template, row_key);
-                }
-                $row.attr('data-rowkey', row_key);
-                $row.find('[id]').each(function() {
-                    $(this).attr('id', $(this).attr('id') + row_key);
-                });
-                $row.find('[for]').each(function() {
-                    $(this).attr('for', $(this).attr('for') + row_key);
-                });
-                // append created row to "body" element of datasheet
-                this.$element.find('.datasheet-body').append($row);
+                (function(row_key) {
+                    var isNewRow = old_data_keys.indexOf(row_key) == -1;
+                    var isChanged = false;
+                    var isEditRow = false;
+                    var isCommonRow = false;
+                    if (!isNewRow) {
+                        isChanged = this.isRowChanged(row_key)
+                    }
+
+                    if (!(isNewRow || isChanged)) {
+                        return;
+                    }
+
+                    if ('_draft' in this._data[row_key] || '_editing' in this._data[row_key]) {
+                        // drafts render with edit template
+                        var $row = this._renderEditRow($edit_template, row_key);
+                        var isEditRow = true;
+                    } else {
+                        // common rows with row template
+                        var isCommonRow = true;
+                        var $row = this._renderRow($row_template, row_key);
+                    }
+                    $row.attr('data-rowkey', row_key);
+                    $row.find('[id]').each(function() {
+                        $(this).attr('id', $(this).attr('id') + row_key);
+                    });
+                    $row.find('[for]').each(function() {
+                        $(this).attr('for', $(this).attr('for') + row_key);
+                    });
+
+                    // bind action buttons
+                    $row.find('.datasheet-saveRow').click(function() {
+                        self.saveRow(row_key);
+                    });
+                    $row.find('.datasheet-discardRow').click(function() {
+                        self.discardRow(row_key);
+                    });
+
+                    if (isNewRow) {
+                        // append created row to "body" element of datasheet
+                        this.$element.find('.datasheet-body').append($row);
+                    } else if (isChanged) {
+                        // if there's changes in old data row, replace with new
+                        this.$element.find('[data-rowkey=' + row_key + ']').replaceWith($row);
+                    }
+                    componentHandler.upgradeDom();
+                    // if there is editing row, focus on it's children, for working 'onfocusout-save' functionality
+                    if (isEditRow) {
+                        var invalidFields = $row.find('.datasheet-invalidField');
+                        if (invalidFields.length) {
+                            invalidFields.eq(0).focus();
+                        } else {
+                            $row.find('input').eq(0).focus();
+                        }
+                    }
+
+                }).call(this, row_key);
             }
 
-            // bind action buttons
-            $row.find('.datasheet-saveRow').click(function() {
-                self.saveRow(row_key);
-            });
-            $row.find('.datasheet-discardRow').click(function() {
-                self.discardRow(row_key);
-            });
-
-            componentHandler.upgradeDom();
+            this._previous_data = JSON.parse(JSON.stringify(this._data));
 
             if (!this.getRowsCount()) {
                 // hide header if there is no data
@@ -98,19 +133,9 @@ define([
             }
             if (!this.getRowsCount(true)) {
                 // hide component if there is no data
-                this.$element.hide();
-                this.$element.addClass('.datasheet-hidden');
+                this.$element.addClass('datasheet-hidden');
             } else {
-                this.$element.show();
-                this.$element.removeClass('.datasheet-hidden');
-            }
-
-            // if there is draft, focus on it's children, for working 'onfocusout-save' functionality
-            var invalidFields = this.$element.find('.datasheet-edit .datasheet-invalidField');
-            if (invalidFields.length) {
-                invalidFields.eq(0).focus();
-            } else {
-                this.$element.find('.datasheet-edit input').eq(0).focus();
+                this.$element.removeClass('datasheet-hidden');
             }
         };
 
@@ -189,7 +214,7 @@ define([
             $row.find('[data-upgraded]').attr('data-upgraded', null)
                                         .removeClass('is-upgraded');                        
             // go over keys in row and fill td's
-            for (key in this._data[row_key]) {
+            for (var key in this._data[row_key]) {
                 var el = $row.find('[data-field=' + key + ']');
                 if (key in this._renders) {
                     el.html(this._renders[key](this._data[row_key]));
@@ -233,10 +258,11 @@ define([
          * @param {Boolean}
          */
         this.setData = function(data, noRender) {
-            this._data = {};
-            for (key in data) {
-                this._data[_.uniqueId()] = data[key];
-            }
+            this._data = data;
+            // this._data = {};
+            // for (var key in data) {
+            //     this._data[_.uniqueId()] = data[key];
+            // }
 
             if (!noRender) {
                 this.render();
@@ -252,32 +278,31 @@ define([
         };
 
         /**
-         * @return {[type]}
+         * [getData description]
+         * @return {[type]} [description]
          */
         this.getData = function() {
-            var result = [];
-            for (key in this._data) {
-                if (!('_draft' in this._data[key])) {
-                    result.push(this._data[key]);
-                }
-            }
-            return result;
+            return this._data;
         };
 
         /**
-         * @param {[type]}
+         * [addRow description]
+         * @param {[type]} noRender [description]
          */
-        this.addRow = function(row) {
-            if (this.isThereDrafts()) {
-                console.log('Engine.Datasheet: cant add new row, drafts exists in dataset');
-                return;
-            }
-            this._data[_.uniqueId()] = jQuery.extend(
+        this.addRow = function(noRender) {
+            var newId = this.getNewId();
+            this._previous_data = JSON.parse(JSON.stringify(this._data));
+            this.discardDrafts();
+            this.resetEditing();
+            this._data[newId] = jQuery.extend(
                 true,
                 {'_draft': true},
                 this._defaults
             );
-            this.render();
+            $(this).trigger('dataChanged');
+            if (!noRender) {
+                this.render();
+            }
         };
 
         /**
@@ -293,8 +318,11 @@ define([
          * @return {[type]}
          */
         this.discardRow = function(key) {
+            this._previous_data = JSON.parse(JSON.stringify(this._data));
             delete this._data[key];
+
             $(this).trigger('dataChanged');
+
             this.render();
         };
 
@@ -303,7 +331,11 @@ define([
          * @return {[type]}
          */
         this.editRow = function(key) {
-            this._data[key]['_draft'] = true;
+            this._previous_data = JSON.parse(JSON.stringify(this._data));
+            this.discardDrafts();
+            this.resetEditing();
+            this._data[key]['_editing'] = true;
+            $(this).trigger('dataChanged');
             this.render();
         };
 
@@ -312,6 +344,7 @@ define([
          * @param  {Number}
          */
         this.saveRow = function(rowkey) {
+            this._previous_data = JSON.parse(JSON.stringify(this._data));
             var self = this;
 
             /** @type {Boolean} self-descriptive */
@@ -343,7 +376,12 @@ define([
             if (isEmpty) {
                 this.discardRow(rowkey);
             } else if (!isThereValidationErrs) {
-                delete data_row['_draft'];
+                if ('_editing' in data_row) {
+                    delete data_row['_editing'];
+                }
+                if ('_draft' in data_row) {
+                    delete data_row['_draft'];
+                }
                 $(this).trigger('dataChanged');
             }
             this.render();
@@ -372,7 +410,7 @@ define([
 
             if (validationRes) {
                 if (!data_row['_validationRes']) {
-                    data_row['_validationRes'] = [];
+                    data_row['_validationRes'] = {};
                 }
                 data_row['_validationRes'][fieldName] = validationRes;
                 return false;
@@ -391,7 +429,7 @@ define([
         this.validateField = function(field, value) {
             var result = [];
             if (field in this._validators) {
-                for (validator in this._validators[field]) {
+                for (var validator in this._validators[field]) {
                     var res = this._validators[field][validator](value);
                     if (typeof res == 'string') {
                         result.push(res);
@@ -407,19 +445,44 @@ define([
          * @return {[type]}
          */
         this.discardDrafts = function() {
-            for (key in this._data) {
+            for (var key in this._data) {
                 if ('_draft' in this._data[key]) {
                     this.discardRow(key);
                 }
             }
+            $(self).trigger('dataChanged');
+        };
+
+        /**
+         * @return {[type]}
+         */
+        this.resetEditing = function() {
+            for (var key in this._data) {
+                if ('_editing' in this._data[key]) {
+                    delete this._data[key]['_editing'];
+                }
+            }
+            $(self).trigger('dataChanged');
         };
 
         /**
          * @return {Boolean}
          */
         this.isThereDrafts = function() {
-            for (key in this._data) {
+            for (var key in this._data) {
                 if ('_draft' in this._data[key]) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        /**
+         * @return {Boolean}
+         */
+        this.isThereEditing = function() {
+            for (var key in this._data) {
+                if ('_editing' in this._data[key]) {
                     return true;
                 }
             }
@@ -432,6 +495,27 @@ define([
          */
         this.setRenders = function(renders) {
             this._renders = renders;
-        }
+        };
+
+        /**
+         * [isRowChanged description]
+         * @param  {[type]}  rowkey [description]
+         * @return {Boolean}        [description]
+         */
+        this.isRowChanged = function(row_key) {
+            return !_.isEqual(this._data[row_key], this._previous_data[row_key]);
+        };
+
+        /**
+         * [getNewId description]
+         * @return {[type]} [description]
+         */
+        this.getNewId = function() {
+            var ids = Object.keys(this._data).map(function(i) { return parseInt(i) });
+            if (ids.length) {
+                return _.max(ids) + 1;
+            }
+            return 1;
+        };
     }
 });

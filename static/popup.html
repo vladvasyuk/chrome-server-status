@@ -16,26 +16,33 @@
 <body>
    <div>
       <div class="table-responsive-vertical shadow-z-1">
-         <form action="#">
          <table data-component="datasheet" class="component servers mdl-data-table" data-name="servers">
+            <colgroup>
+               <col width="50" />
+               <col width="230" />
+               <col width="100" />
+               <col width="185" />
+               <col width="75" />
+               <col width="70" />
+            </colgroup>
             <thead class="datasheet-head">
                <tr>
                   <th class="servers-status "></th>
-                  <th class="servers-url mdl-data-table__cell--non-numeric">URL</th>
-                  <th class="servers-url mdl-data-table__cell--non-numeric">Status</th>
-                  <th class="servers-url mdl-data-table__cell--non-numeric">Last change of status</th>
-                  <th class="servers-show mdl-data-table__cell--non-numeric">Watch</th>
+                  <th class="mdl-data-table__cell--non-numeric">SERVER</th>
+                  <th class="mdl-data-table__cell--non-numeric">STATUS</th>
+                  <th class="mdl-data-table__cell--non-numeric">STATUS CHANGED</th>
+                  <th class="servers-show mdl-data-table__cell--non-numeric">WATCH</th>
                   <th class="servers-action mdl-data-table__cell--non-numeric"></th>
                </tr>
             </thead>
             <tbody class="datasheet-body">
                <tr class="datasheet-row-template">
                   <td class="servers-status mdl-data-table__cell--non-numeric" data-field="status"></td>
-                  <td class="servers-url mdl-data-table__cell--non-numeric"><strong data-field="url"></strong></td>
-                  <td class="servers-url mdl-data-table__cell--non-numeric">
-                     <strong data-field="status_code"></strong>
+                  <td class="mdl-data-table__cell--non-numeric"><strong data-field="url"></strong></td>
+                  <td class="mdl-data-table__cell--non-numeric">
+                     <span data-field="status_code"></span>
                   </td>
-                  <td class="servers-url mdl-data-table__cell--non-numeric">
+                  <td class="mdl-data-table__cell--non-numeric">
                      <span data-field="last_status_time"></span>
                   </td>
                   <td class="servers-show mdl-data-table__cell--non-numeric">
@@ -50,36 +57,38 @@
                   </td>
                </tr>
                <tr class="datasheet-edit-template">
-                  <td class="servers-status"></td>
-                  <td class="servers-url mdl-data-table__cell--non-numeric servers-name" colspan="4">
-                     <!-- Name -->
-                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                      <input class="mdl-textfield__input" data-field="name" type="text" id="servers-name" />
-                      <label class="mdl-textfield__label" for="servers-name">Display name</label>
-                     </div>
-                     <div class="datasheet-validationRes" data-validationRes-field="name"></div>
-
+                  <td class="mdl-data-table__cell--non-numeric servers-name" colspan="5">
                      <!-- Url -->
-                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                     <div class="servers-url mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                       <input class="mdl-textfield__input" data-field="url" type="text" id="servers-url" />
                       <label class="mdl-textfield__label" for="servers-url">Server URL</label>
                      </div>
                      <div class="datasheet-validationRes" data-validationRes-field="url"></div>
 
-                     <!-- Timeout -->
-                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-timeout">
-                      <input class="mdl-textfield__input" data-field="timeout" type="text" id="servers-temout" />
-                      <label class="mdl-textfield__label" for="servers-timeout">Answer timeout</label>
+                     <!-- Name -->
+                     <div class="servers-name mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" data-field="name" type="text" id="servers-name" />
+                      <label class="mdl-textfield__label" for="servers-name">Display name (not required)</label>
                      </div>
-                     <div class="datasheet-validationRes" data-validationRes-field="timeout"></div>
+                     <div class="datasheet-validationRes" data-validationRes-field="name"></div>
+
+                     <!-- Timeout -->
+                     <div class="servers-timeout-container">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-timeout">
+                         <input class="mdl-textfield__input" data-field="timeout" type="text" id="servers-timeout" />
+                         <label class="mdl-textfield__label" for="servers-timeout">Answer timeout</label>
+                        </div>
+                        <div class="datasheet-validationRes" data-validationRes-field="timeout"></div>
+                     </div>
 
                      <!-- Interval -->
-                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-interval">
-                        <input class="mdl-textfield__input" data-field="interval" type="text" id="servers-interval" data-field="interval" />
-                        <label class="mdl-textfield__label" for="servers-interval">Polling interval</label>
+                     <div class="servers-interval-container">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label servers-interval">
+                           <input class="mdl-textfield__input" data-field="interval" type="text" id="servers-interval" data-field="interval" />
+                           <label class="mdl-textfield__label" for="servers-interval">Polling interval</label>
+                        </div>
+                        <div class="datasheet-validationRes" data-validationRes-field="interval"></div>
                      </div>
-                     <div class="datasheet-validationRes" data-validationRes-field="interval"></div>
-
                   </td>
                   <td class="servers-action mdl-data-table__cell--non-numeric">
                      <button class="mdl-button mdl-js-button mdl-button--icon datasheet-action datasheet-saveRow">
@@ -92,7 +101,6 @@
                </tr>
             </tbody>
          </table>
-         </form>
       </div>
       <div class="text-center">
          <button class="mdl-button mdl-js-button mdl-button--colored" id="addServer">Add server</button>

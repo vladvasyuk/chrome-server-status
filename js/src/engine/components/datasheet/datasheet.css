@@ -13,4 +13,5 @@
 .datasheet-hidden {
     background: none;
     border: none;
+    visibility: hidden;
 }

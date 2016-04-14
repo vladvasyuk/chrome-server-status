@@ -2,7 +2,7 @@ body, html {
    font-family: 'Roboto','Helvetica','Arial',sans-serif!important;
    background: #f5f5f5;
    height: inherit !important;
-   overflow: hidden !important;
+   overflow-y: scroll !important;
    padding: 5px;
 }
 
@@ -15,36 +15,47 @@ body, html {
 }
 
 .servers {
-    width: 600px;
+    width: 710px;
+    table-layout: fixed;
 }
 
-.servers .servers-interval {
-    width: 210px;
+.servers td {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+.servers .servers-timeout-container {
+    width: 275px;
+    float: left;
+    margin-right: 30px;
+}
+
+.servers .servers-interval-container {
+    width: 275px;
+    float: left;
+}
+
 
 .servers .servers-url {
-    width: 420px;
+    width: 580px;
 }
 
-.servers .servers-timeout {
-    width: 210px;
+.servers .servers-status .material-icons {
+    margin-top: -3px;
 }
 
-.servers tr td:nth-child(1) {
-    width: 67px;
+.servers .servers-name {
+    width: 580px;
 }
-.servers tr td:nth-child(2) {
-    width: 368px;
+
+.servers .servers-show {
+  text-align: center !important;
 }
-.servers tr td:nth-child(3) {
-    width: 70px;
+
+.servers .servers-show .mdl-checkbox {
+    width: auto !important;
 }
-.servers tr td:nth-child(4) {
-    width: 66px;
-}
-.component {
-    display: none;
-}
+
 
 .datasheet-validationRes {
     margin-top: -10px;
