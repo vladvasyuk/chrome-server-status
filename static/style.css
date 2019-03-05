@@ -42,6 +42,7 @@ body, html {
 
 .servers .servers-status .material-icons {
     margin-top: -3px;
+    display: block;
 }
 
 .servers .servers-name {
